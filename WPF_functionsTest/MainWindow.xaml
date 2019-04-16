@@ -1,0 +1,96 @@
+﻿<Window x:Class="WPF_functionsTest.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:WPF_functionsTest"
+        xmlns:vm="clr-namespace:WPF_functionsTest.ViewModels"
+        xmlns:v="clr-namespace:WPF_functionsTest.Behaviors"
+        mc:Ignorable="d"
+        Title="WPF Functions test project" Height="350" Width="525"
+        MinHeight="200" MinWidth="300">
+
+    <Window.DataContext>
+        <vm:ViewModelFunction />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="50" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <TextBlock Text="Function" Grid.Row="0" Grid.Column="0" TextAlignment="Center"/>
+        <TextBlock Text="Value A" Grid.Row="1" Grid.Column="0" TextAlignment="Center"/>
+        <TextBlock Text="Value B" Grid.Row="1" Grid.Column="2" TextAlignment="Center"/>
+        <TextBlock Text="Value C" Grid.Row="1" Grid.Column="4" TextAlignment="Center"/>
+        
+        <ComboBox x:Name="cb_FunctionName" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding Collection}" 
+                  DisplayMemberPath="Name" Margin="0,0,0,5"/>
+        <ComboBox x:Name="cb_ValueC" Grid.Row="1" Grid.Column="5" 
+                  ItemsSource="{Binding ElementName=cb_FunctionName, Path=SelectedItem.Power, Converter={StaticResource PowerToListConverter} }"
+                  SelectedValue="{Binding ElementName=cb_FunctionName, Path=SelectedItem.C}"/>
+
+        <TextBox x:Name="tb_ValueA" Grid.Row="1" Grid.Column="1" Text="{Binding ElementName=cb_FunctionName, Path=SelectedItem.A}" >
+            <i:Interaction.Behaviors>
+                <v:TextBoxImputBehavior />
+            </i:Interaction.Behaviors>
+        </TextBox>
+
+        <TextBox x:Name="tb_ValueB" Grid.Row="1" Grid.Column="3" Text="{Binding ElementName=cb_FunctionName, Path=SelectedItem.B}">
+            <i:Interaction.Behaviors>
+                <v:TextBoxImputBehavior />
+            </i:Interaction.Behaviors>
+        </TextBox>
+        
+        <DataGrid x:Name="lv_Main" Grid.Row="2" Grid.ColumnSpan="7" HorizontalContentAlignment="Center" 
+                  ItemsSource="{Binding Collection}" AutoGenerateColumns="False" SelectionUnit="Cell" 
+                  CanUserReorderColumns="False" CanUserAddRows="False" CanUserSortColumns="False" >
+            <DataGrid.RowHeaderStyle>
+                <Style TargetType="{x:Type DataGridRowHeader}">
+                    <Setter Property="Content" Value="{Binding Name}" />
+                </Style>
+            </DataGrid.RowHeaderStyle>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="F(x,y)" Binding="{Binding Result}" IsReadOnly="True" Width="*"/>
+                <DataGridTemplateColumn Header="X" Width="*" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding X, UpdateSourceTrigger=LostFocus}" >
+                                <!--Возможно, с точки зрения пункта ТЗ "Значения всегда рассчитываются автоматически" 
+                                более верным было бы использовать  UpdateSourceTrigger=PropertyChanged.
+                                Однако, мы исходим из того, что значения параметров и коэффициентов могут быть любыми - в том числе дробными,
+                                а значит удобнее использовать LostFocus-->
+                                <i:Interaction.Behaviors>
+                                    <v:TextBoxImputBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Y" Width="*" >
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBox Text="{Binding Y, UpdateSourceTrigger=LostFocus}" >
+                                <i:Interaction.Behaviors>
+                                    <v:TextBoxImputBehavior />
+                                </i:Interaction.Behaviors>
+                            </TextBox>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
